@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>i211377 Music Recomendation system</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        #music_list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #music_list li {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #music_list li a {
+            color: #007bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        #music_list li a:hover {
+            color: #0056b3;
+        }
+    </style>
+    <script>
+        function getRecommendations(musicId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/recommendations", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var recommendations = JSON.parse(xhr.responseText);
+                    displayRecommendations(recommendations);
+                }
+            };
+            xhr.send("music_id=" + musicId);
+        }
+
+        function displayRecommendations(recommendations) {
+            var musicList = document.getElementById('music_list');
+            musicList.innerHTML = '';
+
+            for (var i = 0; i < recommendations.length; i++) {
+                var musicId = recommendations[i][0];
+                var musicTitle = recommendations[i][1];
+                var listItem = document.createElement('li');
+                var link = document.createElement('a');
+                link.setAttribute('href', '#');
+                link.setAttribute('onclick', 'getRecommendations("' + musicId + '")');
+                link.textContent = 'ID: ' + musicId + ' | Title: ' + musicTitle;
+                listItem.appendChild(link);
+                musicList.appendChild(listItem);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>i211377 Music Recomendation system</h1>
+    <ul id="music_list">
+        {% if random_music %}
+            {% for music in random_music %}
+            <li>ID: <a href="#" onclick="getRecommendations('{{ music[0] }}')">{{ music[0] }}</a> | Title: {{ music[1] }}</li>
+            {% endfor %}
+        {% else %}
+            <li>No music found</li>
+        {% endif %}
+    </ul>
+</body>
+</html>
+
